@@ -1,0 +1,203 @@
+{
+	"info": {
+		"_postman_id": "fa7de120-e477-4776-b005-c2fe737bd013",
+		"name": "Booking Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "CheckAvailability",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \n    \"containerType\": \"DRY\",\n    \"containerSize\": 20,\n    \"origin\": \"USAAA\",\n    \"destination\": \"Singapore\",\n    \"quantity\": 5\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/bookings/checkAvailability",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"bookings",
+						"checkAvailability"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Book Container",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \n    \"containerType\": \"DRY\",\n    \"containerSize\": 20,\n    \"origin\": \"USAAA\",\n    \"destination\": \"Singapore\",\n    \"quantity\": 5,\n    \"timestamp\": \"2020-10-12T13:53:09Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/bookings/book",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"bookings",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Book Container - Invalid Request (Container Size)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \n    \"containerType\": \"DRY\",\n    \"containerSize\": 50,\n    \"origin\": \"India\",\n    \"destination\": \"Singapore\",\n    \"quantity\": 5,\n    \"timestamp\": \"2020-10-12T13:53:09Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/bookings/book",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"bookings",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Book Container - Invalid Request (Origin Size)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \n    \"containerType\": \"DRY\",\n    \"containerSize\": 20,\n    \"origin\": \"I\",\n    \"destination\": \"Singapore\",\n    \"quantity\": 5,\n    \"timestamp\": \"2020-10-12T13:53:09Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/bookings/book",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"bookings",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Book Container - Invalid Request (Quantity >100)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \n    \"containerType\": \"DRY\",\n    \"containerSize\": 20,\n    \"origin\": \"India\",\n    \"destination\": \"Singapore\",\n    \"quantity\": 5000,\n    \"timestamp\": \"2020-10-12T13:53:09Z\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/bookings/book",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"bookings",
+						"book"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
