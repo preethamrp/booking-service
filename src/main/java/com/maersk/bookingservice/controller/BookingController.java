@@ -8,6 +8,7 @@ import com.maersk.bookingservice.model.BookingDto;
 import com.maersk.bookingservice.model.BookingResponse;
 import com.maersk.bookingservice.service.AvailabilityService;
 import com.maersk.bookingservice.service.BookingService;
+import com.mongodb.MongoException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

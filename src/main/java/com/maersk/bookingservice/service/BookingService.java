@@ -6,6 +6,8 @@ import com.maersk.bookingservice.model.BookingDto;
 import com.maersk.bookingservice.model.BookingResponse;
 import com.maersk.bookingservice.repository.BookingRepository;
 import com.maersk.bookingservice.util.ConversionUtils;
+import com.mongodb.MongoClientException;
+import com.mongodb.MongoException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -58,10 +60,14 @@ public class BookingService {
                 .flatMap(bookingRepository::insert)
                 .map(Booking::getId)
                 .retryWhen(Retry.backoff(MAX_RETRIES, RETRY_BACKOFF)
-                        .filter(throwable -> throwable instanceof DataAccessResourceFailureException))
+                        .filter(throwable -> throwable instanceof MongoException)
+                        .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) ->
+                                new InternalException("Failed to save booking after retrying", retrySignal.failure())))
                 .doOnError(ex -> log.error("Error occurred when trying to save booking: {}", ex.getMessage()))
-                .onErrorResume(throwable ->
+                .onErrorResume(MongoException.class , throwable ->
                         Mono.error(new InternalException("Sorry there was a problem processing your request", throwable)));
+
+
 
 
         return bookingReference.map(ref -> new BookingResponse(String.valueOf(ref), null));

@@ -4,3 +4,4 @@ spring:
       database: BookingsDB
       host: localhost
       port: 27017
+#      uri: mongodb://mongo:270 17/bookingdb

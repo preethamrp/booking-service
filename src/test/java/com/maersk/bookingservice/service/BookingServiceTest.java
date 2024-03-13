@@ -7,6 +7,8 @@ import com.maersk.bookingservice.model.BookingResponse;
 import com.maersk.bookingservice.model.ContainerType;
 import com.maersk.bookingservice.repository.BookingRepository;
 import com.maersk.bookingservice.util.ConversionUtils;
+import com.mongodb.MongoClientException;
+import com.mongodb.MongoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,17 +74,24 @@ class BookingServiceTest {
 
     @Test
     void saveBooking_Retry() {
-        when(sequenceGeneratorService.generateSequence(anyString())).thenThrow(new DataAccessResourceFailureException("Simulated DB failure"));
+        Booking bookingEntity = ConversionUtils.dtoToEntity(bookingDto);
+        bookingEntity.setId(966383);
+        long bookingId = 966383L;
+        when(sequenceGeneratorService.generateSequence(anyString())).thenReturn(bookingId);
+
+        when(bookingRepository.insert(any(Booking.class))).thenThrow(new MongoException("Some Exception"));
 
         // Call the method and verify response
         Mono<BookingResponse> result = bookingService.saveBooking(Mono.just(bookingDto));
         StepVerifier.create(result)
-                .expectErrorMatches(throwable -> throwable instanceof InternalException &&
-                        throwable.getMessage().equals("Sorry there was a problem processing your request"))
+                .expectErrorMatches(throwable -> throwable instanceof InternalException )
                 .verify();
 
         // Verify interactions
         verify(sequenceGeneratorService, Mockito.times(4)).generateSequence(anyString());
+        verify(bookingRepository, Mockito.times(4)).insert(any(Booking.class));
+
+
     }
 
 }

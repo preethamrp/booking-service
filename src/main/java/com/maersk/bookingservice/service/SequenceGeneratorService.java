@@ -1,10 +1,17 @@
 package com.maersk.bookingservice.service;
 
 import com.maersk.bookingservice.entity.DatabaseSequence;
+import com.mongodb.MongoException;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
 import java.util.Objects;
 
 import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
@@ -50,6 +57,5 @@ public class SequenceGeneratorService {
             mongoOperations.insert(primarySequence);
         }
         return primarySequence.getSeq();
-
     }
 }
