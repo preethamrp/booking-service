@@ -4,7 +4,7 @@ FROM openjdk:17-oracle
 WORKDIR /app
 
 # Copy the JAR file into the container
-COPY build/libs/booking-service-0.0.1-SNAPSHOT.jar /app/booking-service.jar
+COPY booking-service-0.0.2-SNAPSHOT.jar /app/booking-service.jar
 
 # Expose the port your application runs on
 EXPOSE 8080

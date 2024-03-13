@@ -8,12 +8,10 @@ import com.maersk.bookingservice.model.BookingDto;
 import com.maersk.bookingservice.model.BookingResponse;
 import com.maersk.bookingservice.service.AvailabilityService;
 import com.maersk.bookingservice.service.BookingService;
-import com.mongodb.MongoException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,10 +63,6 @@ public class BookingController {
                         Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                 .body(new AvailabilityResponse(null, ex.getMessage()))))
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
-
-
     }
-
-
 
 }

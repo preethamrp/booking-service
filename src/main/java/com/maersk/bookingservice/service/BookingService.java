@@ -64,7 +64,7 @@ public class BookingService {
                         .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) ->
                                 new InternalException("Failed to save booking after retrying", retrySignal.failure())))
                 .doOnError(ex -> log.error("Error occurred when trying to save booking: {}", ex.getMessage()))
-                .onErrorResume(MongoException.class , throwable ->
+                .onErrorResume(MongoException.class, throwable ->
                         Mono.error(new InternalException("Sorry there was a problem processing your request", throwable)));
 
 
