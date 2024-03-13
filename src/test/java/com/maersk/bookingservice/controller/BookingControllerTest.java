@@ -1,9 +1,13 @@
 package com.maersk.bookingservice.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.maersk.bookingservice.model.AvailabilityDto;
+import com.maersk.bookingservice.model.AvailabilityResponse;
 import com.maersk.bookingservice.model.BookingDto;
 import com.maersk.bookingservice.model.BookingResponse;
+import com.maersk.bookingservice.service.AvailabilityService;
 import com.maersk.bookingservice.service.BookingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,15 +19,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.support.WebExchangeBindException;
 import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = BookingController.class)
@@ -33,6 +32,9 @@ class BookingControllerTest {
 
     @MockBean
     private BookingService bookingService;
+
+    @MockBean
+    private AvailabilityService availabilityService;
 
     private ObjectMapper objectMapper;
 
@@ -82,7 +84,8 @@ class BookingControllerTest {
     }
 
     @Test
-    void testBookContainer_InvalidBooking_containerSize() throws Exception {
+    void checkAvailability_Success() throws JsonProcessingException {
+        // Mock data
 
         String request = """
                 {
@@ -90,25 +93,33 @@ class BookingControllerTest {
                     "containerSize": 20,
                     "origin": "USAAA",
                     "destination": "Singapore",
-                    "quantity": 5,
-                    "timestamp": "2020-10-12T13:53:09Z"
+                    "quantity": 5
                 }
                 """;
-        BookingDto bookingDto = objectMapper.readValue(request, BookingDto.class);
-        String errorMessage = "Invalid booking data";
 
-        when(bookingService.saveBooking(any())).thenThrow(new WebExchangeBindException(null, mock(BindingResult.class)));
+        String response = """
+                {
+                    "available": true
+                }
+                """;
 
-        WebTestClient.ResponseSpec response1 = webTestClient.post().uri("/api/bookings/book")
+        AvailabilityDto availabilityDto = objectMapper.readValue(request, AvailabilityDto.class);
+        AvailabilityResponse expectedResponse = objectMapper.readValue(response, AvailabilityResponse.class);
+
+
+        // Mock interactions
+        when(availabilityService.checkAvailability(any(Mono.class))).thenReturn(Mono.just(expectedResponse));
+
+        WebTestClient.ResponseSpec response1 = webTestClient.post().uri("/api/bookings/checkAvailability")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(bookingDto), BookingDto.class)
+                .body(Mono.just(availabilityDto), AvailabilityDto.class)
                 .exchange();
 
 
-        response1.expectStatus().isBadRequest()
+        response1.expectStatus().isOk()
                 .expectBody()
                 .consumeWith(System.out::println)
-                .jsonPath("$.error").isEqualTo(errorMessage);
+                .jsonPath("$.available").isEqualTo(true);
 
 
     }

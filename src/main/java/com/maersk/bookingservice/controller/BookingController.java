@@ -1,6 +1,7 @@
 package com.maersk.bookingservice.controller;
 
 import com.maersk.bookingservice.exception.DatabaseException;
+import com.maersk.bookingservice.exception.InternalException;
 import com.maersk.bookingservice.model.AvailabilityDto;
 import com.maersk.bookingservice.model.AvailabilityResponse;
 import com.maersk.bookingservice.model.BookingDto;
@@ -11,6 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +24,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/bookings")
+@Validated
 public class BookingController {
 
     private final BookingService bookingService;
@@ -40,19 +43,31 @@ public class BookingController {
                 .onErrorResume(WebExchangeBindException.class, ex ->
                         Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST)
                                 .body(new BookingResponse(null, Objects.requireNonNull(ex.getFieldError()).getDefaultMessage()))))
+                .onErrorResume(InternalException.class, ex ->
+                        Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(new BookingResponse(null, ex.getMessage()))))
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
 
 
     }
+
 
     @PostMapping("/checkAvailability")
     public Mono<ResponseEntity<AvailabilityResponse>> checkAvailability(@Valid @RequestBody Mono<AvailabilityDto> booking) {
-        return availabilityService.checkAvailability()
-                .map(available -> ResponseEntity.ok().body(available))
+
+        return availabilityService.checkAvailability(booking)
+                .map(savedBooking -> ResponseEntity.status(HttpStatus.OK).body(savedBooking))
                 .onErrorResume(WebExchangeBindException.class, ex ->
                         Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                .body(new AvailabilityResponse(false, Objects.requireNonNull(ex.getFieldError()).getDefaultMessage()))))
+                                .body(new AvailabilityResponse(null, Objects.requireNonNull(ex.getFieldError()).getDefaultMessage()))))
+                .onErrorResume(InternalException.class, ex ->
+                        Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(new AvailabilityResponse(null, ex.getMessage()))))
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
 
+
     }
+
+
+
 }
